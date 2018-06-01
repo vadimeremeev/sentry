@@ -27,7 +27,7 @@ class DummyPipeline(Pipeline):
     provider_manager = {'dummy': DummyProvider()}
 
     def finish_pipeline(self):
-        self.finished = True
+        pass
 
 
 class PipelineTestCase(TestCase):
@@ -37,7 +37,7 @@ class PipelineTestCase(TestCase):
         request.session = {}
         request.user = self.user
 
-        pipeline = DummyPipeline(request, org, 'dummy', config={'some_config': True})
+        pipeline = DummyPipeline(request, 'dummy', org, config={'some_config': True})
         pipeline.initialize()
 
         assert pipeline.is_valid()
@@ -45,7 +45,6 @@ class PipelineTestCase(TestCase):
         assert 'some_config' in pipeline.provider.config
 
         # Test state
-        pipeline.finished = False
         pipeline.dispatch_count = 0
 
         # Pipeline has two steps, ensure both steps compete. Usually the
@@ -60,7 +59,7 @@ class PipelineTestCase(TestCase):
 
         pipeline.next_step()
         assert pipeline.dispatch_count == 2
-        assert pipeline.finished
+        assert pipeline.is_finished
 
         pipeline.clear_session()
         assert not pipeline.state.is_valid()
@@ -71,7 +70,7 @@ class PipelineTestCase(TestCase):
         request.session = {}
         request.user = self.user
 
-        pipeline = DummyPipeline(request, org, 'dummy')
+        pipeline = DummyPipeline(request, 'dummy', org)
         pipeline.initialize()
 
         assert pipeline.is_valid()
