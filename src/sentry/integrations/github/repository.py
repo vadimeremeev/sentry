@@ -6,8 +6,6 @@ import six
 from sentry.models import Integration
 from sentry.plugins import providers
 
-from .client import GitHubAppsClient
-
 WEBHOOK_EVENTS = ['push', 'pull_request']
 
 
@@ -94,9 +92,9 @@ class GitHubRepositoryProvider(providers.IntegrationRepositoryProvider):
         if integration_id is None:
             raise NotImplementedError('GitHub apps requires an integration id to fetch commits')
 
-        client = GitHubAppsClient(
-            Integration.objects.get(id=integration_id).external_id,
-        )
+        client = Integration.objects.get(id=integration_id) \
+            .get_installation() \
+            .get_client()
 
         # use config name because that is kept in sync via webhooks
         name = repo.config['name']
@@ -121,9 +119,9 @@ class GitHubRepositoryProvider(providers.IntegrationRepositoryProvider):
             if integration_id is None:
                 raise NotImplementedError('GitHub apps requires an integration id to fetch commits')
 
-            client = GitHubAppsClient(
-                Integration.objects.get(id=integration_id),
-            )
+            client = Integration.objects.get(id=integration_id) \
+                .get_installation() \
+                .get_client()
 
             # use config name because that is kept in sync via webhooks
             name = repo.config['name']
