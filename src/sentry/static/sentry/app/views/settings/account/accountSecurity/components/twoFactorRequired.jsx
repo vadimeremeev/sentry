@@ -17,12 +17,13 @@ class TwoFactorRequired extends AsyncComponent {
 
   renderBody() {
     let orgsRequire2FA = this.state.organizations
-      .filter(org => org.require2FA === true)
-      .map(({name}) => {
-        return capitalize(name);
-      });
+      .filter(org => org.require2FA)
+      .map(({name}) => capitalize(name));
     let multipleOrgs = orgsRequire2FA.length > 1;
-    let formattedNames = orgsRequire2FA.join(', ').replace(/,(?!.*,)/gim, ' and');
+    let formattedNames = [
+      orgsRequire2FA.slice(0, -1).join(', '),
+      orgsRequire2FA.slice(-1)[0],
+    ].join(orgsRequire2FA.length < 2 ? '' : ' and ');
 
     if (!orgsRequire2FA.length) {
       return null;
